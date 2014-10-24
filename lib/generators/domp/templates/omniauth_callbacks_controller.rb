@@ -1,10 +1,6 @@
 <% module_namespacing do -%>
 class <%= class_name.pluralize %>::OmniauthCallbacksController < Devise::OmniauthCallbacksController
 
-<% providers.each do |provider| -%>
-  alias_method provder.underscore.to_sym, :create
-<% end -%>
-
   def unlink_<%= class_name.downcase %>_authentication
     unless current_<%= class_name.downcase %>.nil?
       provider = AuthenticationProvider.find_by_name(params[:provider])
@@ -18,21 +14,21 @@ class <%= class_name.pluralize %>::OmniauthCallbacksController < Devise::Omniaut
     redirect_to root_path
   end
 
-  private
-
   def create
     auth_params = request.env["omniauth.auth"]
     provider = AuthenticationProvider.where(name: auth_params.provider).first
     if provider.nil?
-      redirect_to root_path, error: 'Authentication provider is not supported'
+      redirect_to root_path, alert: 'Authentication provider is not supported'
     else
       authentication = provider.<%= class_name.downcase %>_authentications.where(uid: auth_params.uid).first
       existing_<%= class_name.downcase %> = current_<%= class_name.downcase %> || (authentication.nil? ? nil : <%= class_name %>.where(authentication.id).first)
       if authentication
         if !current_<%= class_name.downcase %>.nil? && current_<%= class_name.downcase %>.<%= class_name.downcase %>_authentications.include?(authentication)
-          redirect_to root_url, error: provider.name + ' account is already linked to your account'
+          redirect_to root_url, alert: provider.name + ' account is already linked to your account'
+        elsif !current_<%= class_name.downcase %>.nil? && found_user != current_<%= class_name.downcase %>
+          redirect_to root_path, alert: provider.name + ' account is already in use'
         else
-          sign_in_with_existing_authentication(authentication)
+          sign_in_with_existing_authentication(authentication, provider)
         end
       elsif existing_<%= class_name.downcase %>
         create_authentication_and_sign_in(auth_params, existing_user, provider)
@@ -41,6 +37,12 @@ class <%= class_name.pluralize %>::OmniauthCallbacksController < Devise::Omniaut
       end
     end
   end
+
+<% providers.each do |provider| -%>
+  alias_method :<%= provider.underscore %>, :create
+<% end -%>
+
+  private
 
   def sign_in_with_existing_authentication(authentication, provider)
     flash[:success] = 'Succesfully signed in with ' + provider.name
@@ -62,7 +64,7 @@ class <%= class_name.pluralize %>::OmniauthCallbacksController < Devise::Omniaut
     if <%= class_name.downcase %>.valid?
       create_authentication_and_sign_in(auth_params, <%= class_name.downcase %>, provider)
     else
-      flash[:error] = <%= class_name.downcase %>.errors.full_messages.first
+      flash[:alert] = <%= class_name.downcase %>.errors.full_messages.first
       redirect_to new_<%= class_name.downcase %>_registration_url
     end
   end

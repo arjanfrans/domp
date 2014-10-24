@@ -65,9 +65,9 @@ class DompGenerator < Rails::Generators::NamedBase
   def update_routes
     # Inject route to 'unlink' route for unlinking authentication providers
     inject_into_file 'config/routes.rb', before: "devise_for :#{table_name}" do
-      "devise_scope :user do
-        delete 'unlink/:provider/:uid' => 'users/omniauth_callbacks#unlink_user_authentication', :as => :unlink_user_authentication
-      end"
+      "devise_scope :user do\n"
+      "  delete 'unlink/:provider/:uid' => 'users/omniauth_callbacks#unlink_user_authentication', :as => :unlink_user_authentication\n"
+      "end\n\n"
     end
 
     inject_into_file 'config/routes.rb', after: "devise_for :#{table_name}" do

@@ -72,7 +72,6 @@ class DompGenerator < Rails::Generators::NamedBase
 
     inject_into_file 'config/routes.rb', after: "devise_for :#{table_name}" do
       ", controllers: { omniauth_callbacks: '#{table_name}/omniauth_callbacks' }"
-      delete 'unlink/:provider' => 'users/omniauth_callbacks#unlink_omniauth_provider', :as => :unlink_omniauth_provider
     end
   end
 

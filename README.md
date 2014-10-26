@@ -75,7 +75,7 @@ devise_for :users, controllers: { omniauth_callbacks: 'users/omniauth_callbacks'
 Add the following route to add the 'unlink' omniauth account functionality. Replace user/users with the model name you are using. Note that it is a 'delete' route (you can probably use a 'get' too). 
 ```ruby
  devise_scope :user do
-    delete 'unlink/:provider' => 'users/omniauth_callbacks#unlink_user_authentication', :as =>  :unlink_user_authentication
+    delete 'unlink/:provider/:uid' => 'users/omniauth_callbacks#unlink_user_authentication', :as =>  :unlink_user_authentication
 end
 ```
 

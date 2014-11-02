@@ -21,7 +21,7 @@ class <%= class_name.pluralize %>::OmniauthCallbacksController < Devise::Omniaut
       redirect_to root_path, alert: 'Authentication provider is not supported'
     else
       authentication = provider.<%= class_name.downcase %>_authentications.where(uid: auth_params.uid).first
-      existing_<%= class_name.downcase %> = current_<%= class_name.downcase %> || (authentication.nil? ? nil : <%= class_name %>.where(authentication.id).first)
+      existing_<%= class_name.downcase %> = current_<%= class_name.downcase %> || (authentication.nil? ? nil : <%= class_name %>.where(id: authentication.<%= class_name.downcase %>_id).first)
       if authentication
         if !current_<%= class_name.downcase %>.nil? && current_<%= class_name.downcase %>.<%= class_name.downcase %>_authentications.include?(authentication)
           redirect_to root_url, alert: provider.name + ' account is already linked to your account'
